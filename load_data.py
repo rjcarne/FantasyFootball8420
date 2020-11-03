@@ -131,6 +131,7 @@ TE_features = ['Tm','Age','G','GS','Tgt','Rec','ReceivingYds','Y/R','ReceivingTD
 TE = A[A['Pos'] == 4]
 TE = A[TE_features]
 
+QB = QB[QB['GS'] >= 8]
 
 z = StandardScaler()
 
