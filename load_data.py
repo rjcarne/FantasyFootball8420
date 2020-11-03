@@ -5,6 +5,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn import mixture
 from sklearn.metrics import silhouette_score
 import pandas as pd
+from plotnine import *
+
 
 def append_data(X, filepath, year):
     # loads file
@@ -68,6 +70,7 @@ def get_index(list, value):
 
 def get_data(X, column):
     teams = np.unique(X[:,0])
+    
     positions = np.unique(X[:,1])
     X_data = np.empty(X.shape)
     NUM_PLAYERS = X.shape[0]
@@ -75,7 +78,7 @@ def get_data(X, column):
 
     for i in range(NUM_PLAYERS):
         X_data[i][0] = get_index(teams, X[i][0])
-        X_data[i][1] = get_index(teams, X[i][1])
+        X_data[i][1] = get_index(positions, X[i][1])
         for j in range(column,X.shape[1]):
             X_data[i][j] = X[i][j]
 
@@ -105,24 +108,43 @@ keys = X[:,0]
 X = np.delete(X,0,1)
 X_labels = np.delete(X_labels,0,0)
 
+X_data, teams, positions = get_data(X, 2)
+# print(X_data[0])
+# print(keys)
+# print(X_labels)
 
-A = pd.DataFrame(data=X, index= keys, columns=X_labels)
+A = pd.DataFrame(data=X_data, index= keys, columns=X_labels)
+
 QB_features = ['Tm','Age','G','GS','PassingYds','PassingTD','PassingAtt','Int','Cmp','Att','RushingYds','RushingTD','RushingAtt', 'Fumbles','FumblesLost','FantasyPoints']
-QB = A[A['Pos'] == 'QB']
+QB = A[A['Pos'] == 1]
 QB = QB[QB_features]
 
 RB_features = ['Tm','Age','G','GS', 'RushingYds','RushingTD','RushingAtt', 'Tgt','Rec','ReceivingYds','Y/R','ReceivingTD', 'Fumbles','FumblesLost','FantasyPoints']
-RB = A[A['Pos'] == 'RB']
+RB = A[A['Pos'] == 2]
 RB = A[RB_features]
 
 WR_features = ['Tm','Age','G','GS','Tgt','Rec','ReceivingYds','Y/R','ReceivingTD', 'Fumbles','FumblesLost','FantasyPoints']
-WR = A[A['Pos'] == 'WR']
+WR = A[A['Pos'] == 3]
 WR = A[WR_features]
 
 TE_features = ['Tm','Age','G','GS','Tgt','Rec','ReceivingYds','Y/R','ReceivingTD', 'Fumbles','FumblesLost','FantasyPoints']
-TE = A[A['Pos'] == 'TE']
+TE = A[A['Pos'] == 4]
 TE = A[TE_features]
 
-z = StandardScalar()
 
-test = z.fit_transform(QB)
+z = StandardScaler()
+
+QB[QB_features] = z.fit_transform(QB)
+
+EM = mixture.GaussianMixture(n_components = 3)
+
+EM.fit(QB)
+
+cluster = EM.predict(QB)
+
+QB['cluster'] = cluster
+
+g = ggplot(QB, aes(x = 'FantasyPoints', y= 'PassingYds', color = 'cluster')) + geom_point()
+
+file_name = "test"
+ggsave(plot = g, filename = file_name)
