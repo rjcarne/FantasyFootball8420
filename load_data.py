@@ -1,6 +1,10 @@
 import os
 import numpy as np
 import csv
+from sklearn.preprocessing import StandardScaler
+from sklearn import mixture
+from sklearn.metrics import silhouette_score
+import pandas as pd
 
 def append_data(X, filepath, year):
     # loads file
@@ -101,8 +105,24 @@ keys = X[:,0]
 X = np.delete(X,0,1)
 X_labels = np.delete(X_labels,0,0)
 
-X_data, teams, positions = get_data(X, 2)
-    
 
+A = pd.DataFrame(data=X, index= keys, columns=X_labels)
+QB_features = ['Tm','Age','G','GS','PassingYds','PassingTD','PassingAtt','Int','Cmp','Att','RushingYds','RushingTD','RushingAtt', 'Fumbles','FumblesLost','FantasyPoints']
+QB = A[A['Pos'] == 'QB']
+QB = QB[QB_features]
 
+RB_features = ['Tm','Age','G','GS', 'RushingYds','RushingTD','RushingAtt', 'Tgt','Rec','ReceivingYds','Y/R','ReceivingTD', 'Fumbles','FumblesLost','FantasyPoints']
+RB = A[A['Pos'] == 'RB']
+RB = A[RB_features]
 
+WR_features = ['Tm','Age','G','GS','Tgt','Rec','ReceivingYds','Y/R','ReceivingTD', 'Fumbles','FumblesLost','FantasyPoints']
+WR = A[A['Pos'] == 'WR']
+WR = A[WR_features]
+
+TE_features = ['Tm','Age','G','GS','Tgt','Rec','ReceivingYds','Y/R','ReceivingTD', 'Fumbles','FumblesLost','FantasyPoints']
+TE = A[A['Pos'] == 'TE']
+TE = A[TE_features]
+
+z = StandardScalar()
+
+test = z.fit_transform(QB)
