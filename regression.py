@@ -1,6 +1,7 @@
 import pandas as pd
 from sklearn.linear_model import Ridge
 from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
 import numpy as np
 import os
 import matplotlib.pyplot as plt
@@ -65,8 +66,9 @@ def get_ridge_regression(X, Variable, Position):
 
     X = X[features]
 
-    alphas = [0,20,200]
-    cs = ['r', 'g', 'b']
+    alphas = [0,20,50,100,200]
+    
+    cs = ['red', 'green', 'blue', 'orange','black','yellow','purple','cyan','grey','navy']
     coef = []
     for a, c in zip(alphas, cs):
         rr = Ridge(alpha=a, fit_intercept=False)
@@ -80,7 +82,23 @@ def get_ridge_regression(X, Variable, Position):
     plt.legend()
     plt.show()
 
+def get_polynomial_regression(X, Variable, Position):
+    QB_features = ['Age','G','GS', 'Cmp', 'Int', 'Fumbles','FumblesLost','PassingYds','PassingTD','PassingAtt','RushingYds','RushingTD','RushingTD']
+    RB_features = ['Age','G','GS', 'Fumbles','FumblesLost','RushingYds','RushingTD','RushingTD','Tgt','Rec','ReceivingYds','ReceivingTD']
+    WR_features = ['Age','G','GS','Fumbles','FumblesLost','Tgt','Rec','ReceivingYds','ReceivingTD']
+    TE_features = ['Age','G','GS','Fumbles','FumblesLost','Tgt','Rec','ReceivingYds','ReceivingTD']
+    y = X["FantasyPoints"]
 
+    if Position == 'QB':
+        features = QB_features
+    elif Position == 'RB':
+        features = RB_features
+    elif Position == 'WR':
+        features = WR_features
+    elif Position == 'TE':
+        features = TE_features
+
+    X = X[features]
 
 
 
@@ -89,12 +107,12 @@ def get_average(X):
 
 X = get_all_data()
 
-# Y = get_player_df(X, "Tom Brady")
-Y = X[X["Pos"] == 'QB']
+Y = get_player_df(X, "Tom Brady")
+# Y = X[X["Age"] >= 28]
 
 
 # Y = X[X["Player"] == 'Deshaun Watson']
-get_ridge_regression(Y, "Age", "QB")
+get_ridge_regression(Y, "PassingYds", "QB")
 # get_linear_regression(Y)
 # coeff = get_ridge_regression(Y)
 # plt.plot(coeff)
