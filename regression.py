@@ -10,6 +10,9 @@ import matplotlib.pyplot as plt
 def get_player_df(X, player):
     return X[X['Player'] == player]
 
+def get_position_df(X, position):
+    return X[X['Pos'] == position]
+
 
 def get_all_data():
     indeces = []
@@ -49,24 +52,13 @@ def get_year_data(year):
 
 
 def get_ridge_regression(X, Variable, Position):
-    QB_features = ['Age','G','GS', 'Cmp', 'Int', 'Fumbles','FumblesLost','PassingYds','PassingTD','PassingAtt','RushingYds','RushingTD','RushingTD']
-    RB_features = ['Age','G','GS', 'Fumbles','FumblesLost','RushingYds','RushingTD','RushingTD','Tgt','Rec','ReceivingYds','ReceivingTD']
-    WR_features = ['Age','G','GS','Fumbles','FumblesLost','Tgt','Rec','ReceivingYds','ReceivingTD']
-    TE_features = ['Age','G','GS','Fumbles','FumblesLost','Tgt','Rec','ReceivingYds','ReceivingTD']
+    features = get_features(Position)
     y = X["FantasyPoints"]
-
-    if Position == 'QB':
-        features = QB_features
-    elif Position == 'RB':
-        features = RB_features
-    elif Position == 'WR':
-        features = WR_features
-    elif Position == 'TE':
-        features = TE_features
 
     X = X[features]
 
     alphas = [0,20,50,100,200]
+    alphas = [1000000]
     
     cs = ['red', 'green', 'blue', 'orange','black','yellow','purple','cyan','grey','navy']
     coef = []
@@ -75,36 +67,60 @@ def get_ridge_regression(X, Variable, Position):
         rr.fit(X, y)
         model = rr.predict(X)
         plt.plot(sorted(X.iloc[:, X.columns.get_loc(Variable)]), model[np.argsort(X.iloc[:, 0])], c, label='Alpha: {}'.format(a))
-        coef.append(rr.coef_)
-    plt.title("Expected Fantasy Points based on " + Variable + " using Ridge Regression")
-    plt.xlabel(Variable)
-    plt.ylabel("Expected Fantasy Points")
-    plt.legend()
-    plt.show()
+        # plt.plot(model)
+        # coef.append(rr.coef_)
+    # plt.title("Expected Fantasy Points based on " + Variable + " using Ridge Regression")
+    # plt.xlabel(Variable)
+    # plt.ylabel("Expected Fantasy Points")
+    # plt.legend()
+    # plt.show()
 
 def get_polynomial_regression(X, Variable, Position):
-    QB_features = ['Age','G','GS', 'Cmp', 'Int', 'Fumbles','FumblesLost','PassingYds','PassingTD','PassingAtt','RushingYds','RushingTD','RushingTD']
-    RB_features = ['Age','G','GS', 'Fumbles','FumblesLost','RushingYds','RushingTD','RushingTD','Tgt','Rec','ReceivingYds','ReceivingTD']
-    WR_features = ['Age','G','GS','Fumbles','FumblesLost','Tgt','Rec','ReceivingYds','ReceivingTD']
-    TE_features = ['Age','G','GS','Fumbles','FumblesLost','Tgt','Rec','ReceivingYds','ReceivingTD']
+    features = get_features(Position)
     y = X["FantasyPoints"]
-
-    if Position == 'QB':
-        features = QB_features
-    elif Position == 'RB':
-        features = RB_features
-    elif Position == 'WR':
-        features = WR_features
-    elif Position == 'TE':
-        features = TE_features
 
     X = X[features]
 
+def get_linear_regression(X, Variable, Position):
+    features = get_features(Position)
+    y = X["FantasyPoints"]
+    X = X[Variable]
+    # print(X)
+    # points = []
 
+    # for player in range(1, X.shape[0]):
+    #     # print(X[Variable][player])
+    #     points.append((X[Variable][player], y[player]))
+
+    reg = LinearRegression()
+    reg.fit([[0, 0], [1, 1], [2, 2]], [0, 1, 2])
+    plt.plot(reg.coef_)
+
+    # reg.fit(X, y)
+    # plt.plot(points)
+    # print(points)
+    # plt.plot(reg.coef_)
+    # plt.plot(reg)
 
 def get_average(X):
     pass
 
+def get_features(Position):
+    QB_features = ['Age','G','GS', 'Cmp', 'Int', 'Fumbles','FumblesLost','PassingYds','PassingTD','PassingAtt','RushingYds','RushingTD','RushingTD']
+    RB_features = ['Age','G','GS', 'Fumbles','FumblesLost','RushingYds','RushingTD','RushingTD','Tgt','Rec','ReceivingYds','ReceivingTD']
+    WR_features = ['Age','G','GS','Fumbles','FumblesLost','Tgt','Rec','ReceivingYds','ReceivingTD']
+    TE_features = ['Age','G','GS','Fumbles','FumblesLost','Tgt','Rec','ReceivingYds','ReceivingTD']
+
+    if Position == 'QB':
+        return QB_features
+    elif Position == 'RB':
+        return RB_features
+    elif Position == 'WR':
+        return WR_features
+    elif Position == 'TE':
+        return TE_features
+
+    
 
 def main():    
     mydf = get_all_data()
@@ -147,21 +163,29 @@ def main():
     plt.show()
     
 
+def testmain():
 
+    X = get_all_data()
+    # print(X)
+    Y = get_player_df(X, "Deshaun Watson")
+    # Y = get_position_df(X, "QB")
+    Variable = "PassingYds"
+    # Y = Y[Y[Variable] <= 28]
+
+    # get_ridge_regression(Y, Variable, "QB")
+    get_linear_regression(Y, Variable, "QB")
+    # coeff = get_ridge_regression(Y)
+    # plt.plot(coeff)
+    plt.title("Expected Fantasy Points based on " + Variable + " using Ridge Regression")
+    plt.xlabel(Variable)
+    plt.ylabel("Expected Fantasy Points")
+    plt.legend()
+    plt.show()
+    # get_linear_regression1(Y)
+
+
+# testmain()
 main()
 
 
 
-# X = get_all_data()
-
-# Y = get_player_df(X, "Tom Brady")
-# Y = X[X["Age"] >= 28]
-
-
-# Y = X[X["Player"] == 'Deshaun Watson']
-# get_ridge_regression(Y, "PassingYds", "QB")
-# get_linear_regression(Y)
-# coeff = get_ridge_regression(Y)
-# plt.plot(coeff)
-# plt.show()
-# get_linear_regression1(Y)
