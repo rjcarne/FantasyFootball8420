@@ -61,7 +61,7 @@ def get_ridge_regression(X, Y, alphas):
         Y_pred = reg.predict(X)  
         plt.plot(X, Y_pred)
    
-    return "Ridge"
+    return "Ridge"            # Why return a string? is this just to print?
 
 def get_ridge_regression_weights(X, Y, alphas):
     ridge = Ridge(normalize = True)
@@ -181,7 +181,7 @@ def testmain():
 
     X = get_all_data()
     
-    data = get_player_df(X, "Tom Brady")
+    data = get_player_df(X, "Adrian Peterson")
     # X = X[X["Pos"] == "QB"]
     # data = X[X["Age"] <= 28]
 
@@ -200,8 +200,9 @@ def testmain():
     # reg_type = get_linear_regression(X, Y, "red")
     # get_ridge_regression_weights(X, Y, alphas)
 
-    reg_type = get_polynomial_regression(X, Y, "red")
+    reg_type = get_polynomial_regression(X, Y, "red")               # So we are using polinomial here? 
 
+    # We may want to set the boundaries and tick marks of the plots so that the years are not half years
 
     
     plt.title("Expected " + Y_var + " based on " + X_var + " using " + reg_type + " Regression")
