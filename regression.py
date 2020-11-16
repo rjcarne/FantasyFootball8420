@@ -70,7 +70,7 @@ def get_ridge_regression_weights(X, Y, alphas):
     for a in alphas:
         ridge.set_params(alpha = a)
         ridge.fit(X, Y)
-        coefs.append(ridge.coef_[0])
+        coefs.append(ridge.coef_)
         
     
     
@@ -90,7 +90,7 @@ def get_ridge_regression_weights(X, Y, alphas):
         pred2 = ridge.predict(X_test)           
         print("alpha: ", a)
         print("Ridge Coeffecients")
-        print(pd.Series(ridge.coef_[0], index = X.columns)) 
+        print(pd.Series(ridge.coef_, index = X.columns)) 
         print("MSE: " + str(mean_squared_error(y_test, pred2)))          
         print("*******************************")
 
@@ -133,7 +133,7 @@ def get_x_and_y(data, X_var, Y_var, color):
 
     X = data[X_var].values.reshape(-1, 1)  
     Y = data[Y_var].values.reshape(-1, 1)  
-    plt.scatter(X,Y, color = color)
+    # plt.scatter(X,Y, color = color)
     return X,Y
 
 def main():    
@@ -181,7 +181,7 @@ def testmain():
 
     X = get_all_data()
     
-    data = get_player_df(X, "Adrian Peterson")
+    data = get_player_df(X, "Tom Brady")
     # X = X[X["Pos"] == "QB"]
     # data = X[X["Age"] <= 28]
 
@@ -190,26 +190,28 @@ def testmain():
     features = get_features(data["Pos"][0])
 
 
-    X, Y = get_x_and_y(data, X_var, Y_var, "blue")
-    # X = data[features]
-    # X = X.drop(columns='FantasyPoints')
+    # X, Y = get_x_and_y(data, X_var, Y_var, "blue")
+    X = data[features]
+    Y = data["FantasyPoints"]
+    X = X.drop(columns='FantasyPoints')
     # alphas = [0, 1, 5, 10, 25, 50, 100, 300]
 
-    # alphas = 10**np.linspace(10,-2,100)*0.5
-    # reg_type = get_ridge_regression(X, Y, "purple", alphas)
+    alphas = 10**np.linspace(10,-2,100)*0.5
+    # reg_type = get_ridge_regression(X, Y, alphas)
     # reg_type = get_linear_regression(X, Y, "red")
-    # get_ridge_regression_weights(X, Y, alphas)
+    
+    get_ridge_regression_weights(X, Y, alphas)
 
-    reg_type = get_polynomial_regression(X, Y, "red")               # So we are using polinomial here? 
+    # reg_type = get_polynomial_regression(X, Y, "red")               # So we are using polinomial here? 
 
     # We may want to set the boundaries and tick marks of the plots so that the years are not half years
 
     
-    plt.title("Expected " + Y_var + " based on " + X_var + " using " + reg_type + " Regression")
-    plt.xlabel(X_var)
-    plt.ylabel(Y_var)
-    # plt.legend()
-    plt.show()
+    # plt.title("Expected " + Y_var + " based on " + X_var + " using " + reg_type + " Regression")
+    # plt.xlabel(X_var)
+    # plt.ylabel(Y_var)
+    # # plt.legend()
+    # plt.show()
     
 
 
