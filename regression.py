@@ -236,6 +236,7 @@ def featureSpecificLinearReg(maindf, playerName):
         predArray[0][index] = result[0] * 2021 + result[1]    # y = mx+b
         index = index + 1
     print(predArray)
+    return predArray
 
     
 featureSpecificLinearReg(get_all_data(), "DeAndre Hopkins")
