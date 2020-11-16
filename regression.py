@@ -4,6 +4,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
+from scipy import stats
 import numpy as np
 import os
 import matplotlib.pyplot as plt
@@ -107,7 +108,7 @@ def get_linear_regression(X, Y, color):
     
     reg = LinearRegression()  
     reg.fit(X, Y)  
-    Y_pred = reg.predict(X)  
+    Y_pred = reg.predict(X)
     plt.plot(X, Y_pred, color='red')
     return "Linear"
 
@@ -200,12 +201,11 @@ def testmain():
     # reg_type = get_ridge_regression(X, Y, alphas)
     # reg_type = get_linear_regression(X, Y, "red")
     
-    get_ridge_regression_weights(X, Y, alphas)
+    #get_ridge_regression_weights(X, Y, alphas)
 
-    # reg_type = get_polynomial_regression(X, Y, "red")               # So we are using polinomial here? 
+    # reg_type = get_polynomial_regression(X, Y, "red")
 
     # We may want to set the boundaries and tick marks of the plots so that the years are not half years
-
     
     # plt.title("Expected " + Y_var + " based on " + X_var + " using " + reg_type + " Regression")
     # plt.xlabel(X_var)
@@ -214,9 +214,29 @@ def testmain():
     # plt.show()
     
 
-
-testmain()
+#testmain()
 # main()
 
 
+def featureSpecificLinearReg(maindf, playerName):
+    reg = LinearRegression()                                # Regression method
+    playerdf = get_player_df(maindf, playerName)            # Get player Dataframe
+    playerFeatures = get_features(playerdf["Pos"][0])       # Get player features
+    predArray = np.zeros((1, len(playerFeatures)))          # create numpy array to return
+    
+    
+    index = 0
+    for feature in playerFeatures:
+        featureList = []
+        yearList = []
+        for rowCounter, row in playerdf.iterrows():
+            featureList.append(row[feature])
+            yearList.append(int(row["Year"]))
+        result = stats.linregress(yearList, featureList)        # Linear Regression
+        predArray[0][index] = result[0] * 2021 + result[1]    # y = mx+b
+        index = index + 1
+    print(predArray)
+
+    
+featureSpecificLinearReg(get_all_data(), "DeAndre Hopkins")
 
