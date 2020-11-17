@@ -166,16 +166,16 @@ def get_x_and_y(data, X_var, Y_var, color):
 #     casselYears = []
 #     for value in playerdf['FantasyPoints']:
 #         casselPoints.append(value)
-#     for value in playerdf['Year']:
-#         casselYears.append(value)
+    # for value in playerdf['Year']:
+    #     casselYears.append(value)
     
-#     # Visualizations
-#     plt.plot(bradyYears, bradyPoints, 'o', color='red')
-#     plt.plot(manningYears, manningPoints, 'x', color='blue')
-#     plt.plot(casselYears, casselPoints, '+', color='green')
-#     plt.title("QB Fantasy Points by Year")
-#     plt.xlabel("Years") 
-#     plt.ylabel("Points")
+    # # Visualizations
+    # plt.plot(bradyYears, bradyPoints, 'o', color='red')
+    # plt.plot(manningYears, manningPoints, 'x', color='blue')
+    # plt.plot(casselYears, casselPoints, '+', color='green')
+    # plt.title("QB Fantasy Points by Year")
+    # plt.xlabel("Years") 
+    # plt.ylabel("Points")
 #     plt.show()
     
 
@@ -225,6 +225,9 @@ def featureSpecificLinearReg(maindf, playerName):
     playerFeatures = get_features(playerdf["Pos"][0])       # Get player features
     predArray = np.zeros((1, len(playerFeatures)))          # create numpy array to return
 
+    test_val = playerdf[playerFeatures].iloc[-1]["FantasyPoints"]
+    playerdf = playerdf[playerdf["Year"] < 2019]
+
     if len(playerdf.columns) >= 5:
         minAge = playerdf.iloc[0]["Age"]
         maxAge = playerdf.iloc[-1]["Age"]
@@ -247,15 +250,20 @@ def featureSpecificLinearReg(maindf, playerName):
             featureList.append(row[feature])
             yearList.append(int(row["Year"]))
         result = stats.linregress(yearList, featureList)        # Linear Regression
-        predArray[0][index] = result[0] * 2030 + result[1]    # y = mx+b
+        predArray[0][index] = result[0] * 2019 + result[1]    # y = mx+b
         index = index + 1
     print("Predicted Stats: ")
     print(predArray)
     print("************")
     print("Predicted Fantasy Points Next Year")
-    print(auxilary.predict_fantasy_output(playerdf[playerFeatures], playerdf["FantasyPoints"], predArray, 0.005))
+    prediction = auxilary.predict_fantasy_output(playerdf[playerFeatures], playerdf["FantasyPoints"], predArray, 0.005)
+    print(prediction)
     
-
+    print("Error Calculations")
+    difference = test_val - prediction
+    # print(len(test_row.to_numpy()))
+    # print(len(predArray))
+    print("Difference with 2019 data: ", difference)
 
 featureSpecificLinearReg(get_all_data(), "DeAndre Hopkins")
 
