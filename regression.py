@@ -61,7 +61,7 @@ def get_ridge_regression(X, Y, alphas):
         reg.fit(X, Y)  
         coefs.append(reg.coef_)
         Y_pred = reg.predict(X)  
-        plt.plot(X, Y_pred)
+        plt.plot(X, Y_pred, label= "Ridge w alpha = " + str(a))
    
     return "Ridge"            # Why return a string? is this just to print?
 
@@ -83,6 +83,7 @@ def get_ridge_regression_weights(X, Y, alphas):
     plt.xlabel('alpha')
     plt.ylabel('weights')
     plt.plot(alphas, coefs)
+    plt.title("Weight of Features as Alpha Increases")
     plt.show()
 
     for a in alphas:
@@ -102,7 +103,7 @@ def get_polynomial_regression(X, Y, color):
     pol_reg = LinearRegression()
     pol_reg.fit(X_poly, Y)
 
-    plt.plot(X, pol_reg.predict(poly_reg.fit_transform(X)), color=color)
+    plt.plot(X, pol_reg.predict(poly_reg.fit_transform(X)), color=color, label="Polynomial")
     return "Polynomial"
 
 def get_linear_regression(X, Y, color):
@@ -110,7 +111,7 @@ def get_linear_regression(X, Y, color):
     reg = LinearRegression()  
     reg.fit(X, Y)  
     Y_pred = reg.predict(X)
-    plt.plot(X, Y_pred, color='red')
+    plt.plot(X, Y_pred, color='red', label="Linear")
     return "Linear"
 
 def get_features(Position):
@@ -135,7 +136,7 @@ def get_x_and_y(data, X_var, Y_var, color):
 
     X = data[X_var].values.reshape(-1, 1)  
     Y = data[Y_var].values.reshape(-1, 1)  
-    # plt.scatter(X,Y, color = color)
+    plt.scatter(X,Y, color = color)
     return X,Y
 
 # def main():    
@@ -179,43 +180,43 @@ def get_x_and_y(data, X_var, Y_var, color):
 #     plt.show()
     
 
-# def testmain():
+def testmain():
 
-#     X = get_all_data()
+    X = get_all_data()
     
-#     data = get_player_df(X, "Tom Brady")
-#     # X = X[X["Pos"] == "QB"]
-#     # data = X[X["Age"] <= 28]
+    data = get_player_df(X, "Tom Brady")
+    # X = X[X["Pos"] == "QB"]
+    # data = X[X["Age"] <= 28]
 
-#     X_var = "Year"
-#     Y_var = "FantasyPoints"
-#     features = get_features(data["Pos"][0])
+    X_var = "Year"
+    Y_var = "FantasyPoints"
+    features = get_features(data["Pos"][0])
 
 
-#     # X, Y = get_x_and_y(data, X_var, Y_var, "blue")
-#     X = data[features]
-#     Y = data["FantasyPoints"]
-#     X = X.drop(columns='FantasyPoints')
-#     # alphas = [0, 1, 5, 10, 25, 50, 100, 300]
+    X, Y = get_x_and_y(data, X_var, Y_var, "blue")
+    # X = data[features]
+    # Y = data["FantasyPoints"]
+    # X = X.drop(columns='FantasyPoints')
+    alphas = [10, 1000000]
 
-#     alphas = 10**np.linspace(10,-2,100)*0.5
-#     # reg_type = get_ridge_regression(X, Y, alphas)
-#     # reg_type = get_linear_regression(X, Y, "red")
+    # alphas = 10**np.linspace(10,-2,100)*0.5
+    reg_type = get_ridge_regression(X, Y, alphas)
+    reg_type = get_linear_regression(X, Y, "red")
     
-#     #get_ridge_regression_weights(X, Y, alphas)
+    # get_ridge_regression_weights(X, Y, alphas)
 
-#     # reg_type = get_polynomial_regression(X, Y, "red")
+    reg_type = get_polynomial_regression(X, Y, "blue")
 
-#     # We may want to set the boundaries and tick marks of the plots so that the years are not half years
+    # We may want to set the boundaries and tick marks of the plots so that the years are not half years
     
-#     # plt.title("Expected " + Y_var + " based on " + X_var + " using " + reg_type + " Regression")
-#     # plt.xlabel(X_var)
-#     # plt.ylabel(Y_var)
-#     # # plt.legend()
-#     # plt.show()
+    plt.title("Expected " + Y_var + " based on " + X_var)
+    plt.xlabel(X_var)
+    plt.ylabel(Y_var)
+    plt.legend()
+    plt.show()
     
 
-#testmain()
+# testmain()
 # main()
 
 
@@ -258,12 +259,13 @@ def featureSpecificLinearReg(maindf, playerName):
     print("Predicted Fantasy Points Next Year")
     prediction = auxilary.predict_fantasy_output(playerdf[playerFeatures], playerdf["FantasyPoints"], predArray, 0.005)
     print(prediction)
-    
+    print("************")
+
     print("Error Calculations")
     difference = test_val - prediction
     # print(len(test_row.to_numpy()))
     # print(len(predArray))
     print("Difference with 2019 data: ", difference)
 
-featureSpecificLinearReg(get_all_data(), "DeAndre Hopkins")
+featureSpecificLinearReg(get_all_data(), "Tom Brady")
 
