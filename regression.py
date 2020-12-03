@@ -8,7 +8,6 @@ from scipy import stats
 import numpy as np
 import os
 import matplotlib.pyplot as plt
-import auxilary
 
 
 def get_player_df(X, player):
@@ -63,7 +62,7 @@ def get_ridge_regression(X, Y, alphas):
         Y_pred = reg.predict(X)  
         plt.plot(X, Y_pred, label= "Ridge w alpha = " + str(a))
    
-    return "Ridge"            # Why return a string? is this just to print?
+    return "Ridge"            
 
 def get_ridge_regression_weights(X, Y, alphas):
     ridge = Ridge(normalize = True)
@@ -139,54 +138,19 @@ def get_x_and_y(data, X_var, Y_var, color):
     plt.scatter(X,Y, color = color)
     return X,Y
 
-# def main():    
-#     mydf = get_all_data()
-    
-#     # Tom Brady Data
-#     playerdf = get_player_df(mydf, 'Tom Brady')
-#     bradyPoints = []
-#     bradyYears = []
-#     for value in playerdf['FantasyPoints']:
-#         bradyPoints.append(value)
-#     for value in playerdf['Year']:
-#         bradyYears.append(value)  
-        
-        
-#     # Peyton Manning Data
-#     playerdf = get_player_df(mydf, 'Peyton Manning')
-#     manningPoints = []
-#     manningYears = []
-#     for value in playerdf['FantasyPoints']:
-#         manningPoints.append(value)
-#     for value in playerdf['Year']:
-#         manningYears.append(value)
-        
-#     # Matt Cassel
-#     playerdf = get_player_df(mydf, 'Matt Cassel')
-#     casselPoints = []
-#     casselYears = []
-#     for value in playerdf['FantasyPoints']:
-#         casselPoints.append(value)
-    # for value in playerdf['Year']:
-    #     casselYears.append(value)
-    
-    # # Visualizations
-    # plt.plot(bradyYears, bradyPoints, 'o', color='red')
-    # plt.plot(manningYears, manningPoints, 'x', color='blue')
-    # plt.plot(casselYears, casselPoints, '+', color='green')
-    # plt.title("QB Fantasy Points by Year")
-    # plt.xlabel("Years") 
-    # plt.ylabel("Points")
-#     plt.show()
-    
+def predict_fantasy_output(X, Y, X_test, alpha):
+    ridge = Ridge(alpha = alpha, normalize = True)
+    ridge.fit(X, Y)
 
-def testmain():
+    pred = ridge.predict(X_test.reshape(1,-1))           
+    
+    return pred[0]
+
+def regressionGraph():
 
     X = get_all_data()
     
     data = get_player_df(X, "Tom Brady")
-    # X = X[X["Pos"] == "QB"]
-    # data = X[X["Age"] <= 28]
 
     X_var = "Year"
     Y_var = "FantasyPoints"
@@ -194,20 +158,13 @@ def testmain():
 
 
     X, Y = get_x_and_y(data, X_var, Y_var, "blue")
-    # X = data[features]
-    # Y = data["FantasyPoints"]
-    # X = X.drop(columns='FantasyPoints')
+    
     alphas = [10, 1000000]
 
-    # alphas = 10**np.linspace(10,-2,100)*0.5
     reg_type = get_ridge_regression(X, Y, alphas)
     reg_type = get_linear_regression(X, Y, "red")
     
-    # get_ridge_regression_weights(X, Y, alphas)
-
     reg_type = get_polynomial_regression(X, Y, "blue")
-
-    # We may want to set the boundaries and tick marks of the plots so that the years are not half years
     
     plt.title("Expected " + Y_var + " based on " + X_var)
     plt.xlabel(X_var)
@@ -215,10 +172,6 @@ def testmain():
     plt.legend()
     plt.show()
     
-
-# testmain()
-# main()
-
 
 def featureSpecificLinearReg(maindf, playerName):
     reg = LinearRegression()                                # Regression method
@@ -257,15 +210,35 @@ def featureSpecificLinearReg(maindf, playerName):
     print(predArray)
     print("************")
     print("Predicted Fantasy Points Next Year")
-    prediction = auxilary.predict_fantasy_output(playerdf[playerFeatures], playerdf["FantasyPoints"], predArray, 0.005)
+    prediction = predict_fantasy_output(playerdf[playerFeatures], playerdf["FantasyPoints"], predArray, 0.005)
     print(prediction)
     print("************")
 
     print("Error Calculations")
     difference = test_val - prediction
-    # print(len(test_row.to_numpy()))
-    # print(len(predArray))
+   
     print("Difference with 2019 data: ", difference)
 
-featureSpecificLinearReg(get_all_data(), "Tom Brady")
 
+def get_info(player):
+
+    X = get_all_data()
+        
+    data = get_player_df(X, player)
+
+    X_var = "Year"
+    Y_var = "FantasyPoints"
+    features = get_features(data["Pos"][0])
+
+
+    X, Y = get_x_and_y(data, X_var, Y_var, "blue")
+    X = data[features]
+    Y = data["FantasyPoints"]
+    X = X.drop(columns='FantasyPoints')
+    alphas = 10**np.linspace(10,-2,100)*0.5
+    regressionGraph()
+    get_ridge_regression_weights(X, Y, alphas)
+    featureSpecificLinearReg(get_all_data(), player)
+
+
+get_info("Tom Brady")
